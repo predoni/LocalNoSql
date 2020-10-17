@@ -1,0 +1,2 @@
+﻿https://en.wikipedia.org/wiki/Document-oriented_database
+https://docs.mongodb.com/manual/reference/method/

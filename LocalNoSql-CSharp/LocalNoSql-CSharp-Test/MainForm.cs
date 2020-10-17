@@ -27,7 +27,6 @@ namespace LocalNoSql_CSharp_Test
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            LocalNoSql_CSharp.TestLib.ExecuteTest();
         }
     }
 }
