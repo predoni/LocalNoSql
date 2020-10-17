@@ -10,7 +10,6 @@ namespace LocalNoSql_CSharp_NUnitTest.DB
         {
         }
 
-
         [TestCase("C:\\testdb", "")]
         [TestCase("", "testDBName")]
         [TestCase("C:\\testdb\\", "testDBNa????me")]
