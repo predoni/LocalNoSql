@@ -132,4 +132,10 @@
   <data name="Root_directory_not_allowed" xml:space="preserve">
     <value>Using root directory to store databases is not allowed. Please create at least one subdirectory in your tree of directories.</value>
   </data>
+  <data name="This_collection_already_exists" xml:space="preserve">
+    <value>This collection already exists.</value>
+  </data>
+  <data name="This_collection_does_not_exists" xml:space="preserve">
+    <value>This collection does not exists.</value>
+  </data>
 </root>

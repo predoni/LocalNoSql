@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LocalNoSql_CSharp.Common;
+using LocalNoSql_CSharp.Enums;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +13,8 @@ namespace LocalNoSql_CSharp.DB
     public class Database : Object, IDatabase
     {
         #region Properties
+        const string CollectionFileExtension = "cll";
+
         /// <summary>
         /// The database is a directory!
         /// "RootPath" is the full directory path, where all databases will be created as subdirectories.
@@ -30,6 +34,16 @@ namespace LocalNoSql_CSharp.DB
         /// </summary>
         private string _FullDatabasePath;
         public string FullDatabasePath { get => this._FullDatabasePath; }
+
+        /// <summary>
+        /// The last error object
+        /// </summary>
+        public IError LastError { get; set; }
+
+        /// <summary>
+        /// The log level that has been set
+        /// </summary>
+        public LogLevel LogLevel { get; set; }
         #endregion
 
         #region Constructors and Destructor
@@ -137,7 +151,7 @@ namespace LocalNoSql_CSharp.DB
         /// -or-
         /// The specified path is invalid(for example, it is on an unmapped drive).</exception>
         /// <returns>Returns true on success, otherwise false.</returns>
-        public bool Delete()
+        public bool Drop()
         {
             if (!this.Exists())
                 // Has already been deleted.
@@ -147,6 +161,207 @@ namespace LocalNoSql_CSharp.DB
 
             return true;
         }
+
+        /// <summary>
+        /// Returns the version of this library.
+        /// </summary>
+        /// <returns>Returns the version of this library.</returns>
+        public string Version()
+        {
+            return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        }
+
+        #region Collection
+        /// <summary>
+        /// Builds a collection file path.
+        /// </summary>
+        /// <param name="name">The collection name</param>
+        /// <returns>The collection file path.</returns>
+        public string GetCollectionPath(string name)
+        {
+            return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionFileExtension);
+        }
+
+        /// <summary>
+        /// Verifies if a collection is already created.
+        /// </summary>
+        /// <param name="name">The collection name</param>
+        /// <returns>true if exists, otherwise false.</returns>
+        public bool CollectionExists(string name)
+        {
+            return System.IO.File.Exists(this.GetCollectionPath(name));
+        }
+
+        /// <summary>
+        /// Creates a new collection file.
+        /// </summary>
+        /// <param name="name">The collection name.</param>
+        /// <exception cref="UnauthorizedAccessException">
+        /// The caller does not have the required permission.
+        /// -or-
+        /// path specified a file that is read-only.
+        /// -or-
+        /// path specified a file that is hidden.
+        /// </exception>
+        /// <exception cref="ArgumentException">path is a zero-length string, contains only white space, or contains one or more invalid characters as defined by InvalidPathChars.</exception>
+        /// <exception cref="ArgumentNullException">path is null.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="DirectoryNotFoundException">The specified path is invalid (for example, it is on an unmapped drive).</exception>
+        /// <exception cref="IOException">An I/O error occurred while creating the file.</exception>
+        /// <exception cref="NotSupportedException">path is in an invalid format.</exception>
+        /// <returns>true on success, otherwise false.</returns>
+        public bool CreateCollection(string name)
+        {
+            if (this.CollectionExists(name))
+                throw new Exception(Resource.Exceptions.This_collection_already_exists + Environment.NewLine + name);
+
+            FileStream fs = System.IO.File.Create(this.GetCollectionPath(name));
+            fs.Close();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Delete a collection.
+        /// </summary>
+        /// <param name="name">Collection name</param>
+        /// <exception cref="ArgumentException">path is a zero-length string, contains only white space, or contains one or more invalid characters as defined by InvalidPathChars.</exception>
+        /// <exception cref="ArgumentNullException">path is null.</exception>
+        /// <exception cref="DirectoryNotFoundException">The specified path is invalid(for example, it is on an unmapped drive).</exception>
+        /// <exception cref="IOException">
+        /// The specified file is in use.
+        /// -or-
+        /// There is an open handle on the file, and the operating system is Windows XP or earlier. This open handle can result from enumerating directories and files. For more information, see How to: Enumerate Directories and Files.
+        /// </exception>
+        /// <exception cref="NotSupportedException">path is in an invalid format.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="UnauthorizedAccessException">
+        /// The caller does not have the required permission.
+        /// -or-
+        /// The file is an executable file that is in use.
+        /// -or-
+        /// path is a directory.
+        /// -or-
+        /// path specified a read-only file.
+        /// </exception>
+        /// <returns>true on success, otherwise false.</returns>
+        public bool DropCollection(string name)
+        {
+            if (!this.CollectionExists(name))
+                return true;
+
+            System.IO.File.Delete(this.GetCollectionPath(name));
+
+            return true;
+        }
+
+        /// <summary>
+        /// Rename a collection.
+        /// </summary>
+        /// <param name="currentName">The current name</param>
+        /// <param name="newName">The new name.</param>
+        /// <exception cref="IOException">destFileName already exists.</exception>
+        /// <exception cref="FileNotFoundException">sourceFileName was not found.</exception>
+        /// <exception cref="ArgumentNullException">sourceFileName or destFileName is null.</exception>
+        /// <exception cref="ArgumentException">sourceFileName or destFileName is a zero-length string, contains only white space, or contains invalid characters as defined in InvalidPathChars.</exception>
+        /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="DirectoryNotFoundException">The path specified in sourceFileName or destFileName is invalid, (for example, it is on an unmapped drive).</exception>
+        /// <exception cref="NotSupportedException">sourceFileName or destFileName is in an invalid format.</exception>
+        /// <returns>true on success, othewise false.</returns>
+        public bool RenameCollection(string currentName, string newName)
+        {
+            if (this.CollectionExists(newName))
+                throw new Exception(Resource.Exceptions.This_collection_already_exists + Environment.NewLine + newName);
+
+            if (!this.CollectionExists(currentName))
+                throw new Exception(Resource.Exceptions.This_collection_does_not_exists + Environment.NewLine + currentName);
+
+            System.IO.File.Move(this.GetCollectionPath(currentName), this.GetCollectionPath(newName));
+
+            return true;
+        }
+
+        /// <summary>
+        /// Lists all collections in the current database.
+        /// </summary>
+        /// <returns>Returns a string array with collection name.</returns>
+        public string[] GetCollections()
+        {
+            return 
+                System.IO.Directory
+                .GetFiles(this.FullDatabasePath, "*." + Database.CollectionFileExtension)
+                .Select(
+                    o => o.Replace(this.FullDatabasePath, "")
+                          .Replace(Path.DirectorySeparatorChar.ToString(), "")
+                          .Replace("." + Database.CollectionFileExtension, "")
+                ).ToArray();
+        }
+        #endregion
+
+        #region View
+        /// <summary>
+        /// Creates a view.
+        /// </summary>
+        /// <returns>IViewInfo: the created view info.</returns>
+        public IViewInfo CreateView()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Delete a view.
+        /// </summary>
+        /// <param name="name">View name</param>
+        /// <returns>true on success, otherwise false.</returns>
+        public bool DropView(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Rename a view.
+        /// </summary>
+        /// <param name="currentName">The current name</param>
+        /// <param name="newName">The new name.</param>
+        /// <returns>true on success, othewise false.</returns>
+        public bool RenameView(string currentName, string newName)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Select a view based on its name.
+        /// </summary>
+        /// <param name="name">View name</param>
+        /// <exception cref="EViewNotFound">View has not been found.</exception>
+        /// <returns>IView: if exists, otherwise throws an exception.</returns>
+        public IView GetView(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns view information for a given view name.
+        /// </summary>
+        /// <param name="name">The view name.</param>
+        /// <exception cref="EViewNotFound">View has not been found.</exception>
+        /// <returns>IViewInfo: the view info</returns>
+        public IViewInfo GetViewInfo(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Lists all views in the current database.
+        /// </summary>
+        /// <returns>Returns a string array with collection name.</returns>
+        public string[] GetViews()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
         #endregion
     }
 }

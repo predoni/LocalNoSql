@@ -104,5 +104,23 @@ namespace LocalNoSql_CSharp.Resource {
                 return ResourceManager.GetString("Root_directory_not_allowed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This collection already exists..
+        /// </summary>
+        internal static string This_collection_already_exists {
+            get {
+                return ResourceManager.GetString("This_collection_already_exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This collection does not exists..
+        /// </summary>
+        internal static string This_collection_does_not_exists {
+            get {
+                return ResourceManager.GetString("This_collection_does_not_exists", resourceCulture);
+            }
+        }
     }
 }
