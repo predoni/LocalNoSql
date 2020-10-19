@@ -140,6 +140,13 @@ namespace LocalNoSql_CSharp.DB
         /// </summary>
         /// <returns>Returns a string array with collection name.</returns>
         string[] GetCollections();
+
+        /// <summary>
+        /// Selects a collection from current database.
+        /// </summary>
+        /// <param name="name">The collection name.</param>
+        /// <returns>Returns a collection with the specified name from the current database.</returns>
+        IDBCollection GetCollection(string name);
         #endregion
 
         #region View

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,18 +9,39 @@ using System.Threading.Tasks;
 
 namespace LocalNoSql_CSharp.DB
 {
-    public interface IDBCollection
+    public class DBCollection : Object, LocalNoSql_CSharp.DB.IDBCollection
     {
         #region Properties
         /// <summary>
         /// The collection name.
         /// </summary>
-        string Name { get; }
+        private string _Name;
+        public string Name { get => this._Name; }
 
         /// <summary>
-        /// "FullCollectionPath" is the path of the file for current collection.
+        /// "FullCollectionPath" is the path of the file for the current collection.
         /// </summary>
-        string FullCollectionPath { get; }
+        private string _FullCollectionPath;
+        public string FullCollectionPath { get => this._FullCollectionPath; }
+        #endregion
+
+        #region Constructors and Destructor
+        /// <summary>
+        /// The constructor for collection object
+        /// </summary>
+        /// <param name="name">The collection name where all its documents reside.</param>
+        /// <param name="fullCollectionPath">The path of the file for the current collection.</param>
+        public DBCollection(string name, string fullCollectionPath) : base()
+        {
+            if (string.IsNullOrEmpty(name))
+                throw new Exception(Resource.Exceptions.Empty_string_for_parameter + nameof(name));
+
+            if (string.IsNullOrEmpty(fullCollectionPath))
+                throw new Exception(Resource.Exceptions.Empty_string_for_parameter + nameof(fullCollectionPath));
+
+            this._Name = name;
+            this._FullCollectionPath = fullCollectionPath;
+        }
         #endregion
 
         #region Methods
@@ -27,30 +49,48 @@ namespace LocalNoSql_CSharp.DB
         /// Counts the documents in a collection.
         /// </summary>
         /// <returns>The number of documents in a collection</returns>
-        uint Count();
+        public uint Count()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Returns the size in bytes of the collection.
         /// </summary>
         /// <returns>double: the size in bytes of the collection</returns>
-        double DataSize();
+        public double DataSize()
+        {
+            using (System.IO.FileStream fs = System.IO.File.OpenRead(this.FullCollectionPath))
+            {
+                return fs.Length;
+            }
+        }
 
         /// <summary>
         /// Deletes documents from a collection.
         /// </summary>
         /// <returns>Total deleted documents.</returns>
-        int Delete();
+        public int Delete()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Returns an interator object of documents that have distinct values for the specified field.
         /// </summary>
         /// <returns>Array of documents</returns>
-        IEnumerator Distinct();
+        public IEnumerator Distinct()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Performs a query on a collection and returns an interator object.
         /// </summary>
-        IEnumerator Find();
+        public IEnumerator Find()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Inserts documents in a collection.
@@ -58,71 +98,112 @@ namespace LocalNoSql_CSharp.DB
         /// <param name="jsonDocumentString">The json string that represents the document</param>
         /// <exception cref="Exception">On failure</exception>
         /// <returns>total number of inserted documents</returns>
-        int Insert(string jsonDocumentString);
+        public int Insert(string jsonDocumentString)
+        {
+            byte[] document = Encoding.ASCII.GetBytes(Newtonsoft.Json.Linq.JObject.Parse(jsonDocumentString).ToString(Newtonsoft.Json.Formatting.None, null));
+
+            using (System.IO.FileStream fs = System.IO.File.Open(this.FullCollectionPath, FileMode.Append, FileAccess.ReadWrite))
+            {
+                fs.Write(document, 0, document.Length);
+                fs.Flush();
+
+                return -1;
+            }
+        }
 
         /// <summary>
         /// Performs map-reduce style data aggregation.
         /// </summary>
         /// <returns></returns>
-        IEnumerator MapReduce();
+        public IEnumerator MapReduce()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Replaces a single document in a collection.
         /// </summary>
         /// <returns>true on success, otherwise false.</returns>
-        bool Replace();
+        public bool Replace()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Reports on the state of a collection.
         /// </summary>
-        void Stats();
+        public void Stats()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Modifies documents in a collection.
         /// </summary>
         /// <returns>The number of updated documents</returns>
-        int Update();
+        public int Update()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Performs diagnostic operations on a collection.
         /// </summary>
         /// <returns>true on success, otherwise false.</returns>
-        bool Validate();
+        public bool Validate()
+        {
+            throw new NotImplementedException();
+        }
 
         #region Index
         /// <summary>
         /// Builds an index on a collection.
         /// </summary>
         /// <returns>IIndex: info about the created index.</returns>
-        IIndex CreateIndex();
+        public IIndex CreateIndex()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Removes a specified index on a collection.
         /// </summary>
         /// <param name="name">The index name</param>
         /// <returns>true on success, otherwise false.</returns>
-        bool DropIndex(string name);
+        public bool DropIndex(string name)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Drop and then creates the index.
         /// </summary>
         /// <param name="name">The index name</param>
         /// <returns>true on success, otherwise false.</returns>
-        bool RebuildIndex(string name);
+        public bool RebuildIndex(string name)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Returns a collection of indexes from a given collection.
         /// </summary>
         /// <param name="collectionName">The collection name.</param>
         /// <returns>IEnumerator: Returns a collection of indexes from a given collection.</returns>
-        IEnumerator GetIndexes(string collectionName);
+        public IEnumerator GetIndexes(string collectionName)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Reports the total size used by the indexes on a collection.Provides a wrapper around the totalIndexSize field of the collStats output.
         /// </summary>
         /// <param name="name">Index name</param>
         /// <returns>The index size.</returns>
-        double IndexSize(string name);
+        public double IndexSize(string name)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #endregion

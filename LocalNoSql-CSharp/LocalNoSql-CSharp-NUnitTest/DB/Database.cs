@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using LocalNoSql_CSharp.DB;
+using NUnit.Framework;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -167,6 +168,7 @@ namespace LocalNoSql_CSharp_NUnitTest.DB
         #region Collection
         [Test, Order(6)] // You can see the order in debug. Is correct!
         [TestCase("C:\\testdb\\", "ExistentDB", "Collection01")]
+        [TestCase("C:\\testdb\\", "ExistentDB", "Collec????tion01")]
         public void GetCollectionPath(string rootPath, string databaseName, string collectionName)
         {
             System.Diagnostics.Debug.WriteLine("Start testing: {0}", new[] { System.Reflection.MethodInfo.GetCurrentMethod().Name });
@@ -337,6 +339,35 @@ namespace LocalNoSql_CSharp_NUnitTest.DB
                     "{0}: {1}",
                     nameof(database.GetCollections),
                     collectionList
+                );
+            }
+            catch (NUnit.Framework.SuccessException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message + Environment.NewLine);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(rootPath), rootPath);
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(databaseName), databaseName);
+                System.Diagnostics.Debug.WriteLine(e.Message + Environment.NewLine);
+            }
+        }
+
+        [Test, Order(12)] // You can see the order in debug. Is correct!
+        [TestCase("C:\\testdb\\", "ExistentDB", "Collection01")]
+        public void GetCollection(string rootPath, string databaseName, string collectionName)
+        {
+            System.Diagnostics.Debug.WriteLine("Start testing: {0}", new[] { System.Reflection.MethodInfo.GetCurrentMethod().Name });
+            try
+            {
+                LocalNoSql_CSharp.DB.Database database = new LocalNoSql_CSharp.DB.Database(rootPath, databaseName);
+
+                IDBCollection collection = database.GetCollection(collectionName);
+
+                Assert.Pass(
+                    "{0}: {1}",
+                    nameof(database.GetCollection),
+                    collection.FullCollectionPath
                 );
             }
             catch (NUnit.Framework.SuccessException e)

@@ -79,20 +79,11 @@ namespace LocalNoSql_CSharp.Resource {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid database name..
+        ///   Looks up a localized string similar to Invalid characters for parameter: .
         /// </summary>
-        internal static string Invalid_database_name {
+        internal static string Invalid_characters_for_parameter {
             get {
-                return ResourceManager.GetString("Invalid_database_name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid path characters for parameter: .
-        /// </summary>
-        internal static string Invalid_path_characters_for_parameter {
-            get {
-                return ResourceManager.GetString("Invalid_path_characters_for_parameter", resourceCulture);
+                return ResourceManager.GetString("Invalid_characters_for_parameter", resourceCulture);
             }
         }
         
@@ -120,6 +111,15 @@ namespace LocalNoSql_CSharp.Resource {
         internal static string This_collection_does_not_exists {
             get {
                 return ResourceManager.GetString("This_collection_does_not_exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to create the collection..
+        /// </summary>
+        internal static string Unable_to_create_the_collection {
+            get {
+                return ResourceManager.GetString("Unable_to_create_the_collection", resourceCulture);
             }
         }
     }

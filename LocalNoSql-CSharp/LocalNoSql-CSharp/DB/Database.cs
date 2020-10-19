@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace LocalNoSql_CSharp.DB
 {
     [Serializable]
-    public class Database : Object, IDatabase
+    public class Database : Object, LocalNoSql_CSharp.DB.IDatabase
     {
         #region Properties
         const string CollectionFileExtension = "cll";
@@ -67,14 +67,14 @@ namespace LocalNoSql_CSharp.DB
                 throw new Exception(
                     string.Format(
                         "{0} {1} = {2}", 
-                        Resource.Exceptions.Invalid_path_characters_for_parameter,
+                        Resource.Exceptions.Invalid_characters_for_parameter,
                         nameof(databaseName),
                         databaseName
                     )
                 );
 
             if (databaseName.IndexOf(System.IO.Path.DirectorySeparatorChar) != -1)
-                throw new Exception(Resource.Exceptions.Invalid_database_name + Environment.NewLine + databaseName);
+                throw new Exception(Resource.Exceptions.Invalid_characters_for_parameter + Environment.NewLine + databaseName);
 
             if (System.IO.Directory.GetDirectoryRoot(rootPath).Equals(rootPath))
                 throw new Exception(Resource.Exceptions.Root_directory_not_allowed + Environment.NewLine + nameof(rootPath));
@@ -179,6 +179,19 @@ namespace LocalNoSql_CSharp.DB
         /// <returns>The collection file path.</returns>
         public string GetCollectionPath(string name)
         {
+            if (name.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) != -1)
+                throw new Exception(
+                    string.Format(
+                        "{0} {1} = {2}",
+                        Resource.Exceptions.Invalid_characters_for_parameter,
+                        nameof(name),
+                        name
+                    )
+                );
+
+            if (name.IndexOf(System.IO.Path.DirectorySeparatorChar) != -1)
+                throw new Exception(Resource.Exceptions.Invalid_characters_for_parameter + Environment.NewLine + name);
+
             return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionFileExtension);
         }
 
@@ -296,6 +309,19 @@ namespace LocalNoSql_CSharp.DB
                           .Replace(Path.DirectorySeparatorChar.ToString(), "")
                           .Replace("." + Database.CollectionFileExtension, "")
                 ).ToArray();
+        }
+
+        /// <summary>
+        /// Selects a collection from current database.
+        /// </summary>
+        /// <param name="name">The collection name.</param>
+        /// <returns>Returns a collection with the specified name from the current database.</returns>
+        public IDBCollection GetCollection(string name)
+        {
+            if (!this.CollectionExists(name))
+                throw new Exception(Resource.Exceptions.This_collection_does_not_exists + Environment.NewLine + name);
+
+            return new DBCollection(name, this.GetCollectionPath(name));
         }
         #endregion
 

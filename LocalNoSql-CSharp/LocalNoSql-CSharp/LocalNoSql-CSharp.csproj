@@ -37,6 +37,9 @@
     <Reference Include="Newtonsoft.Json.Bson, Version=1.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.Bson.1.0.2\lib\net45\Newtonsoft.Json.Bson.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json.Schema, Version=3.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.Schema.3.0.13\lib\net45\Newtonsoft.Json.Schema.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Private>True</Private>
     </Reference>
@@ -65,7 +68,9 @@
   <ItemGroup>
     <Compile Include="Common\Error.cs" />
     <Compile Include="Common\IError.cs" />
+    <Compile Include="Common\JsonUtil.cs" />
     <Compile Include="DB\Database.cs" />
+    <Compile Include="DB\DBCollection.cs" />
     <Compile Include="DB\IDBCollection.cs" />
     <Compile Include="DB\IDatabase.cs" />
     <Compile Include="DB\IIndex.cs" />
