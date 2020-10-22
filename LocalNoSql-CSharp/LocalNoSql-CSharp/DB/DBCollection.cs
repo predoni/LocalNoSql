@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LocalNoSql_CSharp.Exceptions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
@@ -34,10 +35,10 @@ namespace LocalNoSql_CSharp.DB
         public DBCollection(string name, string fullCollectionPath) : base()
         {
             if (string.IsNullOrEmpty(name))
-                throw new Exception(Resource.Exceptions.Empty_string_for_parameter + nameof(name));
+                throw new EmptyStringForParameterException(nameof(name));
 
             if (string.IsNullOrEmpty(fullCollectionPath))
-                throw new Exception(Resource.Exceptions.Empty_string_for_parameter + nameof(fullCollectionPath));
+                throw new EmptyStringForParameterException(nameof(fullCollectionPath));
 
             this._Name = name;
             this._FullCollectionPath = fullCollectionPath;
@@ -92,23 +93,50 @@ namespace LocalNoSql_CSharp.DB
             throw new NotImplementedException();
         }
 
+        class ObjId : Object
+        {
+            public object _id { get; set; }
+        }
+
         /// <summary>
         /// Inserts documents in a collection.
+        /// As parameter accepts only JSON array.
         /// </summary>
-        /// <param name="jsonDocumentString">The json string that represents the document</param>
-        /// <exception cref="Exception">On failure</exception>
+        /// <param name="jsonDocumentString">The json string that represents an array of documents.</param>
+        /// <exception cref="Exceptions.EmptyStringForParameterException">Empty json string.</exception>
+        /// <exception cref="Exceptions.EmptyArrayException">Empty json array."</exception>
+        /// <exception cref="Exceptions.FailureException">Empty json array."</exception>
         /// <returns>total number of inserted documents</returns>
         public int Insert(string jsonDocumentString)
         {
-            byte[] document = Encoding.ASCII.GetBytes(Newtonsoft.Json.Linq.JObject.Parse(jsonDocumentString).ToString(Newtonsoft.Json.Formatting.None, null));
+            if (string.IsNullOrEmpty(jsonDocumentString))
+                throw new EmptyStringForParameterException(nameof(jsonDocumentString));
 
-            using (System.IO.FileStream fs = System.IO.File.Open(this.FullCollectionPath, FileMode.Append, FileAccess.ReadWrite))
+            Newtonsoft.Json.Linq.JArray jarr = Newtonsoft.Json.Linq.JArray.Parse(jsonDocumentString);
+            if (jarr.Count <= 0)
+                throw new EmptyArrayException(nameof(jsonDocumentString));
+
+            int docsNum = 0;
+            for (int i = 0; i < jarr.Count; i++)
             {
-                fs.Write(document, 0, document.Length);
-                fs.Flush();
+                System.Diagnostics.Debug.WriteLine(jarr[i].ToString());
 
-                return -1;
+                Model.DocumentObject<string> documentObject = 
+                    Newtonsoft.Json.JsonConvert.DeserializeObject<Model.DocumentObject<string>>(jarr[i].ToString());
+
+                byte[] document = Encoding.ASCII.GetBytes(Common.JsonUtil.GetFormattedJsonLine(jarr[i].ToString()) + Environment.NewLine);
+
+                using (System.IO.FileStream fs = System.IO.File.Open(this.FullCollectionPath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                {
+                    
+                    fs.Write(document, 0, document.Length);
+                    fs.Flush();
+
+                    docsNum++;
+                }
             }
+
+            return docsNum;
         }
 
         /// <summary>

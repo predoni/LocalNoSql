@@ -77,6 +77,11 @@
     <Compile Include="DB\IView.cs" />
     <Compile Include="DB\IViewInfo.cs" />
     <Compile Include="Enums\LogLevel.cs" />
+    <Compile Include="Exceptions\IdColumnMissingException.cs" />
+    <Compile Include="Exceptions\EmptyStringForParameterException.cs" />
+    <Compile Include="Exceptions\EmptyArrayException.cs" />
+    <Compile Include="Exceptions\FailureException.cs" />
+    <Compile Include="Model\DocumentObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resource\Exceptions.Designer.cs">
       <AutoGen>True</AutoGen>

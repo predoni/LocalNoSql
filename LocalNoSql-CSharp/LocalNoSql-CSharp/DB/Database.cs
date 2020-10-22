@@ -1,5 +1,6 @@
 ﻿using LocalNoSql_CSharp.Common;
 using LocalNoSql_CSharp.Enums;
+using LocalNoSql_CSharp.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,16 +56,16 @@ namespace LocalNoSql_CSharp.DB
         public Database(string rootPath, string databaseName) : base()
         {
             if (string.IsNullOrEmpty(rootPath))
-                throw new Exception(Resource.Exceptions.Empty_string_for_parameter + nameof(rootPath));
+                throw new EmptyStringForParameterException(nameof(rootPath));
 
             if (string.IsNullOrEmpty(databaseName))
-                throw new Exception(Resource.Exceptions.Empty_string_for_parameter + nameof(databaseName));
+                throw new EmptyStringForParameterException(nameof(databaseName));
 
             if (!System.IO.Directory.Exists(rootPath))
                 throw new DirectoryNotFoundException(Resource.Exceptions.Directory_not_found + rootPath);
 
             if (databaseName.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) != -1)
-                throw new Exception(
+                throw new FailureException(
                     string.Format(
                         "{0} {1} = {2}", 
                         Resource.Exceptions.Invalid_characters_for_parameter,
@@ -74,10 +75,10 @@ namespace LocalNoSql_CSharp.DB
                 );
 
             if (databaseName.IndexOf(System.IO.Path.DirectorySeparatorChar) != -1)
-                throw new Exception(Resource.Exceptions.Invalid_characters_for_parameter + Environment.NewLine + databaseName);
+                throw new FailureException(Resource.Exceptions.Invalid_characters_for_parameter + Environment.NewLine + databaseName);
 
             if (System.IO.Directory.GetDirectoryRoot(rootPath).Equals(rootPath))
-                throw new Exception(Resource.Exceptions.Root_directory_not_allowed + Environment.NewLine + nameof(rootPath));
+                throw new FailureException(Resource.Exceptions.Root_directory_not_allowed + Environment.NewLine + nameof(rootPath));
 
             this._RootPath = rootPath.EndsWith(System.IO.Path.DirectorySeparatorChar.ToString()) 
                              ? rootPath.Substring(0, rootPath.Length - 1)
@@ -180,7 +181,7 @@ namespace LocalNoSql_CSharp.DB
         public string GetCollectionPath(string name)
         {
             if (name.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) != -1)
-                throw new Exception(
+                throw new FailureException(
                     string.Format(
                         "{0} {1} = {2}",
                         Resource.Exceptions.Invalid_characters_for_parameter,
@@ -190,7 +191,7 @@ namespace LocalNoSql_CSharp.DB
                 );
 
             if (name.IndexOf(System.IO.Path.DirectorySeparatorChar) != -1)
-                throw new Exception(Resource.Exceptions.Invalid_characters_for_parameter + Environment.NewLine + name);
+                throw new FailureException(Resource.Exceptions.Invalid_characters_for_parameter + Environment.NewLine + name);
 
             return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionFileExtension);
         }
@@ -226,7 +227,7 @@ namespace LocalNoSql_CSharp.DB
         public bool CreateCollection(string name)
         {
             if (this.CollectionExists(name))
-                throw new Exception(Resource.Exceptions.This_collection_already_exists + Environment.NewLine + name);
+                throw new FailureException(Resource.Exceptions.This_collection_already_exists + Environment.NewLine + name);
 
             FileStream fs = System.IO.File.Create(this.GetCollectionPath(name));
             fs.Close();
@@ -285,10 +286,10 @@ namespace LocalNoSql_CSharp.DB
         public bool RenameCollection(string currentName, string newName)
         {
             if (this.CollectionExists(newName))
-                throw new Exception(Resource.Exceptions.This_collection_already_exists + Environment.NewLine + newName);
+                throw new FailureException(Resource.Exceptions.This_collection_already_exists + Environment.NewLine + newName);
 
             if (!this.CollectionExists(currentName))
-                throw new Exception(Resource.Exceptions.This_collection_does_not_exists + Environment.NewLine + currentName);
+                throw new FailureException(Resource.Exceptions.This_collection_does_not_exists + Environment.NewLine + currentName);
 
             System.IO.File.Move(this.GetCollectionPath(currentName), this.GetCollectionPath(newName));
 
@@ -319,7 +320,7 @@ namespace LocalNoSql_CSharp.DB
         public IDBCollection GetCollection(string name)
         {
             if (!this.CollectionExists(name))
-                throw new Exception(Resource.Exceptions.This_collection_does_not_exists + Environment.NewLine + name);
+                throw new FailureException(Resource.Exceptions.This_collection_does_not_exists + Environment.NewLine + name);
 
             return new DBCollection(name, this.GetCollectionPath(name));
         }

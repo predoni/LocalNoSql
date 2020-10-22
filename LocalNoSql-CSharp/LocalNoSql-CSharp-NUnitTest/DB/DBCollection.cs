@@ -2,12 +2,19 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace LocalNoSql_CSharp_NUnitTest.DB
 {
     public class DBCollection
     {
+        private const string JSON_EmptyString = "";
+        private const string JSON_EmptyArray = "[]";
+        private const string JSON_OneDocumentArray = "[{Id: 1, col1: \"Value 1\"}]";
+        private const string JSON_ManyDocumentsArray = "[{Id: \"1000.50\", col1: \"Value 1\"}, {Id: 2, col1: \"Value 2\"}, {Id: 3, col1: \"Value 3\"}]";
+        private const string JSON_DuplicatedIds = "[{Id: 1, col1: \"Value 1\"}, {Id: 2, col1: \"Value 2\"}, {Id: 2, col1: \"Value 3\"}]";
+
         [SetUp]
         public void Setup()
         {
@@ -61,6 +68,83 @@ namespace LocalNoSql_CSharp_NUnitTest.DB
                     collection.FullCollectionPath,
                     nameof(collection.DataSize),
                     collection.DataSize().ToString()
+                );
+            }
+            catch (NUnit.Framework.SuccessException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message + Environment.NewLine);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(rootPath), rootPath);
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(databaseName), databaseName);
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(collectionName), collectionName);
+                System.Diagnostics.Debug.WriteLine(e.Message + Environment.NewLine);
+            }
+        }
+
+        [Test, Order(3)] // You can see the order in debug. Is correct!
+        [TestCase("C:\\testdb", "ExistentDB", "Collection01", DBCollection.JSON_EmptyString)]
+        [TestCase("C:\\testdb", "ExistentDB", "Collection01", DBCollection.JSON_EmptyArray)]
+        [TestCase("C:\\testdb", "ExistentDB", "Collection01", DBCollection.JSON_ManyDocumentsArray)]
+        [TestCase("C:\\testdb", "ExistentDB", "Collection01", DBCollection.JSON_DuplicatedIds)]
+        public void Insert(string rootPath, string databaseName, string collectionName, string jsonArray)
+        {
+            System.Diagnostics.Debug.WriteLine("Start testing: {0}", new[] { System.Reflection.MethodInfo.GetCurrentMethod().Name });
+
+            try
+            {
+                LocalNoSql_CSharp.DB.Database database = new LocalNoSql_CSharp.DB.Database(rootPath, databaseName);
+                IDBCollection collection = database.GetCollection(collectionName);
+                
+                Assert.Pass
+                (
+                    "{0}: {1} = {2}{3}Json array:{4}",
+                    collection.FullCollectionPath,
+                    nameof(collection.Insert),
+                    collection.Insert(jsonArray),
+                    Environment.NewLine,
+                    jsonArray
+                );
+            }
+            catch (NUnit.Framework.SuccessException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message + Environment.NewLine);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(rootPath), rootPath);
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(databaseName), databaseName);
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(collectionName), collectionName);
+                System.Diagnostics.Debug.WriteLine(e.Message + Environment.NewLine);
+            }
+        }
+
+        [Test, Order(4)] // You can see the order in debug. Is correct!
+        [TestCase("C:\\testdb", "ExistentDB", "Collection01")]
+        public void Insert(string rootPath, string databaseName, string collectionName)
+        {
+            System.Diagnostics.Debug.WriteLine("Start testing: {0}", new[] { System.Reflection.MethodInfo.GetCurrentMethod().Name });
+
+            try
+            {
+                LocalNoSql_CSharp.DB.Database database = new LocalNoSql_CSharp.DB.Database(rootPath, databaseName);
+                IDBCollection collection = database.GetCollection(collectionName);
+                string jsonArray = 
+                    "[" +
+                        "{Id: \"" + Guid.NewGuid().ToString() + "\", col1: \"Value 1\"}, " +
+                        "{Id: \"" + Guid.NewGuid().ToString() + "\", col1: \"Value 2\"}, " +
+                        "{Id: \"" + Guid.NewGuid().ToString() + "\", col1: \"Value 3\"}" +
+                    "]";
+
+                Assert.Pass
+                (
+                    "{0}: {1} = {2}{3}Json array:{4}",
+                    collection.FullCollectionPath,
+                    nameof(collection.Insert),
+                    collection.Insert(jsonArray),
+                    Environment.NewLine,
+                    jsonArray
                 );
             }
             catch (NUnit.Framework.SuccessException e)
