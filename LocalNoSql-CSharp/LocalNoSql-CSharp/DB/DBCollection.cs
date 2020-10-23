@@ -24,6 +24,23 @@ namespace LocalNoSql_CSharp.DB
         /// </summary>
         private string _FullCollectionPath;
         public string FullCollectionPath { get => this._FullCollectionPath; }
+
+        /// <summary>
+        /// "FullCollectionIndexPath" it is the path to the index file for the current collection.
+        /// </summary>
+        private string _FullCollectionIndexPath;
+        public string FullCollectionIndexPath { get => this._FullCollectionIndexPath; }
+
+        /// <summary>
+        /// "FullCollectionLockPath" it is the path to the lock file for the current collection.
+        /// </summary>
+        private string _FullCollectionLockPath;
+        public string FullCollectionLockPath { get => this._FullCollectionLockPath; }
+
+        /// <summary>
+        /// The period in seconds until the lock action is declared a failure.
+        /// </summary>
+        const int LockTimeout = 30;
         #endregion
 
         #region Constructors and Destructor
@@ -32,7 +49,7 @@ namespace LocalNoSql_CSharp.DB
         /// </summary>
         /// <param name="name">The collection name where all its documents reside.</param>
         /// <param name="fullCollectionPath">The path of the file for the current collection.</param>
-        public DBCollection(string name, string fullCollectionPath) : base()
+        public DBCollection(string name, string fullCollectionPath, string fullCollectionIndexPath, string fullCollectionLockPath) : base()
         {
             if (string.IsNullOrEmpty(name))
                 throw new EmptyStringForParameterException(nameof(name));
@@ -40,8 +57,16 @@ namespace LocalNoSql_CSharp.DB
             if (string.IsNullOrEmpty(fullCollectionPath))
                 throw new EmptyStringForParameterException(nameof(fullCollectionPath));
 
+            if (string.IsNullOrEmpty(fullCollectionIndexPath))
+                throw new EmptyStringForParameterException(nameof(fullCollectionIndexPath));
+
+            if (string.IsNullOrEmpty(fullCollectionLockPath))
+                throw new EmptyStringForParameterException(nameof(fullCollectionLockPath));
+
             this._Name = name;
             this._FullCollectionPath = fullCollectionPath;
+            this._FullCollectionIndexPath = fullCollectionIndexPath;
+            this._FullCollectionLockPath = fullCollectionLockPath;
         }
         #endregion
 
@@ -65,6 +90,77 @@ namespace LocalNoSql_CSharp.DB
             {
                 return fs.Length;
             }
+        }
+
+        /// <summary>
+        /// Returns the size in bytes of the index.
+        /// </summary>
+        /// <returns>double: the size in bytes of the index</returns>
+        public double IndexSize()
+        {
+            using (System.IO.FileStream fs = System.IO.File.OpenRead(this.FullCollectionIndexPath))
+            {
+                return fs.Length;
+            }
+        }
+
+        /// <summary>
+        /// Lock a collection and do not allow working on this collection until it releases the lock.
+        /// </summary>
+        /// <returns>true on success, false otherwise</returns>
+        public bool Lock()
+        {
+            DateTime deEnd = DateTime.Now.AddSeconds(DBCollection.LockTimeout);
+
+            while (deEnd > DateTime.Now)
+            {
+                if (this.IsLocked())
+                    System.Threading.Thread.Sleep(100);
+                else
+                {
+                    try
+                    {
+                        System.IO.File.WriteAllBytes(this.FullCollectionLockPath, new byte[1] { 1 });
+                        return true;
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Unlocks a collection.
+        /// </summary>
+        /// <returns>true on success, false otherwise</returns>
+        public bool Unlock()
+        {
+            try
+            {
+                System.IO.File.WriteAllBytes(this.FullCollectionLockPath, new byte[1] { 0 });
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Verifies if the collection is locked.
+        /// </summary>
+        /// <returns>true if is locked, false otherwise</returns>
+        public bool IsLocked()
+        {
+            var arr = System.IO.File.ReadAllBytes(this.FullCollectionLockPath);
+            if (arr.Length == 0)
+                return false;
+
+            return arr[0] == 1;
         }
 
         /// <summary>
@@ -93,11 +189,6 @@ namespace LocalNoSql_CSharp.DB
             throw new NotImplementedException();
         }
 
-        class ObjId : Object
-        {
-            public object _id { get; set; }
-        }
-
         /// <summary>
         /// Inserts documents in a collection.
         /// As parameter accepts only JSON array.
@@ -121,18 +212,28 @@ namespace LocalNoSql_CSharp.DB
             {
                 System.Diagnostics.Debug.WriteLine(jarr[i].ToString());
 
-                Model.DocumentObject<string> documentObject = 
+                Model.DocumentObject<string> documentObject =
                     Newtonsoft.Json.JsonConvert.DeserializeObject<Model.DocumentObject<string>>(jarr[i].ToString());
 
                 byte[] document = Encoding.ASCII.GetBytes(Common.JsonUtil.GetFormattedJsonLine(jarr[i].ToString()) + Environment.NewLine);
 
-                using (System.IO.FileStream fs = System.IO.File.Open(this.FullCollectionPath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                using (System.IO.FileStream fsCll = System.IO.File.Open(this.FullCollectionPath, FileMode.Append, FileAccess.Write, FileShare.Read))
                 {
-                    
-                    fs.Write(document, 0, document.Length);
-                    fs.Flush();
+                    string statistics;
+                    string indexString;
 
-                    docsNum++;
+                    using (System.IO.StreamReader sr = new StreamReader(this.FullCollectionIndexPath))
+                    {
+                        statistics = sr.ReadLine();
+                        indexString = sr.ReadLine();
+                    }
+
+                    using (System.IO.FileStream fsIdx = System.IO.File.Open(this.FullCollectionPath.Replace(".cll", ".idx"), FileMode.Append, FileAccess.Write, FileShare.Read))
+                    {
+                        //fsCll.Write(document, 0, document.Length);
+                        //fsCll.Flush();
+                        docsNum++;
+                    }
                 }
             }
 

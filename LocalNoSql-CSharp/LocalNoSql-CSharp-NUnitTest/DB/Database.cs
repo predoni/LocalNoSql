@@ -176,10 +176,12 @@ namespace LocalNoSql_CSharp_NUnitTest.DB
             {
                 LocalNoSql_CSharp.DB.Database database = new LocalNoSql_CSharp.DB.Database(rootPath, databaseName);
                 Assert.Pass(
-                    "{0}: {1} => {2}",
+                    "{0}: {1} => {2}{3}{4}",
                     nameof(database.GetCollectionPath),
                     collectionName,
-                    database.GetCollectionPath(collectionName)
+                    database.GetCollectionPath(collectionName, LocalNoSql_CSharp.Enums.CollectionFileType.Collection),
+                    Environment.NewLine,
+                    database.GetCollectionPath(collectionName, LocalNoSql_CSharp.Enums.CollectionFileType.Index)
                 );
             }
             catch (NUnit.Framework.SuccessException e)

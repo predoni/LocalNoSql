@@ -103,8 +103,9 @@ namespace LocalNoSql_CSharp.DB
         /// Builds a collection file path.
         /// </summary>
         /// <param name="name">The collection name</param>
+        /// <param name="fileType">The type of the file is collection or index: <see cref="CollectionFileType"/></param>
         /// <returns>The collection file path.</returns>
-        string GetCollectionPath(string name);
+        string GetCollectionPath(string name, CollectionFileType fileType);
 
         /// <summary>
         /// Verifies if a collection is already created.

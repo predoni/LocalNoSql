@@ -69,6 +69,7 @@
     <Compile Include="Common\Error.cs" />
     <Compile Include="Common\IError.cs" />
     <Compile Include="Common\JsonUtil.cs" />
+    <Compile Include="Common\LineReader.cs" />
     <Compile Include="DB\Database.cs" />
     <Compile Include="DB\DBCollection.cs" />
     <Compile Include="DB\IDBCollection.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="DB\IIndex.cs" />
     <Compile Include="DB\IView.cs" />
     <Compile Include="DB\IViewInfo.cs" />
+    <Compile Include="Enums\CollectionFileType.cs" />
     <Compile Include="Enums\LogLevel.cs" />
     <Compile Include="Exceptions\IdColumnMissingException.cs" />
     <Compile Include="Exceptions\EmptyStringForParameterException.cs" />

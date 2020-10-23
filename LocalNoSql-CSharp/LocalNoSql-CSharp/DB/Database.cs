@@ -4,6 +4,7 @@ using LocalNoSql_CSharp.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,10 @@ namespace LocalNoSql_CSharp.DB
     {
         #region Properties
         const string CollectionFileExtension = "cll";
+        const string CollectionIndexFileExtension = "idx";
+        const string CollectionLockFileExtension = "lock";
+        const string IndexStatistics = "Lines:0;";
+        const string IndexCollection = "Empty";
 
         /// <summary>
         /// The database is a directory!
@@ -177,8 +182,9 @@ namespace LocalNoSql_CSharp.DB
         /// Builds a collection file path.
         /// </summary>
         /// <param name="name">The collection name</param>
+        /// <param name="fileType">The type of the file is collection or index: <see cref="CollectionFileType"/></param>
         /// <returns>The collection file path.</returns>
-        public string GetCollectionPath(string name)
+        public string GetCollectionPath(string name, CollectionFileType fileType)
         {
             if (name.IndexOfAny(System.IO.Path.GetInvalidFileNameChars()) != -1)
                 throw new FailureException(
@@ -193,7 +199,13 @@ namespace LocalNoSql_CSharp.DB
             if (name.IndexOf(System.IO.Path.DirectorySeparatorChar) != -1)
                 throw new FailureException(Resource.Exceptions.Invalid_characters_for_parameter + Environment.NewLine + name);
 
-            return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionFileExtension);
+            if (fileType == CollectionFileType.Collection)
+                return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionFileExtension);
+
+            if (fileType == CollectionFileType.Index)
+                return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionIndexFileExtension);
+            else
+                return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionLockFileExtension);
         }
 
         /// <summary>
@@ -203,7 +215,7 @@ namespace LocalNoSql_CSharp.DB
         /// <returns>true if exists, otherwise false.</returns>
         public bool CollectionExists(string name)
         {
-            return System.IO.File.Exists(this.GetCollectionPath(name));
+            return System.IO.File.Exists(this.GetCollectionPath(name, CollectionFileType.Collection));
         }
 
         /// <summary>
@@ -229,7 +241,20 @@ namespace LocalNoSql_CSharp.DB
             if (this.CollectionExists(name))
                 throw new FailureException(Resource.Exceptions.This_collection_already_exists + Environment.NewLine + name);
 
-            FileStream fs = System.IO.File.Create(this.GetCollectionPath(name));
+            FileStream fs = System.IO.File.Create(this.GetCollectionPath(name, CollectionFileType.Collection));
+            fs.Close();
+
+            using (StreamWriter sw = new StreamWriter(this.GetCollectionPath(name, CollectionFileType.Index), true))
+            {
+                sw.WriteLine(Database.IndexStatistics);
+                sw.WriteLine(Database.IndexCollection);
+
+                FileStream fs1 = System.IO.File.Open(this.GetCollectionPath(name, CollectionFileType.Index), FileMode.Append, FileAccess.Write);
+                fs1.Close();
+            }
+
+            fs = System.IO.File.Create(this.GetCollectionPath(name, CollectionFileType.Lock));
+            fs.Write(new byte[1] { 0 }, 0, 1);
             fs.Close();
 
             return true;
@@ -264,9 +289,20 @@ namespace LocalNoSql_CSharp.DB
             if (!this.CollectionExists(name))
                 return true;
 
-            System.IO.File.Delete(this.GetCollectionPath(name));
+            try
+            {
+                throw new NotImplementedException("Implementeaza verificarea pe LOCK!");
 
-            return true;
+                System.IO.File.Delete(this.GetCollectionPath(name, CollectionFileType.Lock));
+                System.IO.File.Delete(this.GetCollectionPath(name, CollectionFileType.Collection));
+                System.IO.File.Delete(this.GetCollectionPath(name, CollectionFileType.Index));
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -291,9 +327,21 @@ namespace LocalNoSql_CSharp.DB
             if (!this.CollectionExists(currentName))
                 throw new FailureException(Resource.Exceptions.This_collection_does_not_exists + Environment.NewLine + currentName);
 
-            System.IO.File.Move(this.GetCollectionPath(currentName), this.GetCollectionPath(newName));
 
-            return true;
+            try
+            {
+                throw new NotImplementedException("Implementeaza verificarea pe LOCK!");
+
+                System.IO.File.Move(this.GetCollectionPath(currentName, CollectionFileType.Index), this.GetCollectionPath(newName, CollectionFileType.Lock));
+                System.IO.File.Move(this.GetCollectionPath(currentName, CollectionFileType.Collection), this.GetCollectionPath(newName, CollectionFileType.Collection));
+                System.IO.File.Move(this.GetCollectionPath(currentName, CollectionFileType.Index), this.GetCollectionPath(newName, CollectionFileType.Index));
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -322,7 +370,14 @@ namespace LocalNoSql_CSharp.DB
             if (!this.CollectionExists(name))
                 throw new FailureException(Resource.Exceptions.This_collection_does_not_exists + Environment.NewLine + name);
 
-            return new DBCollection(name, this.GetCollectionPath(name));
+            return 
+                new DBCollection
+                (
+                    name, 
+                    this.GetCollectionPath(name, CollectionFileType.Collection),
+                    this.GetCollectionPath(name, CollectionFileType.Index),
+                    this.GetCollectionPath(name, CollectionFileType.Lock)
+                );
         }
         #endregion
 
