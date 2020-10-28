@@ -1,4 +1,5 @@
 ﻿using LocalNoSql_CSharp.DB;
+using LocalNoSql_CSharp.Exceptions;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -146,6 +147,47 @@ namespace LocalNoSql_CSharp_NUnitTest.DB
                     Environment.NewLine,
                     jsonArray
                 );
+            }
+            catch (NUnit.Framework.SuccessException e)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Message + Environment.NewLine);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(rootPath), rootPath);
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(databaseName), databaseName);
+                System.Diagnostics.Debug.WriteLine("{0}: {1}", nameof(collectionName), collectionName);
+                System.Diagnostics.Debug.WriteLine(e.Message + Environment.NewLine);
+            }
+        }
+
+        [Test, Order(5)] // You can see the order in debug. Is correct!
+        [TestCase("C:\\testdb", "ExistentDB", "Collection01")]
+        public void Lock_IsLocked_Unlock(string rootPath, string databaseName, string collectionName)
+        {
+            System.Diagnostics.Debug.WriteLine("Start testing: {0}", new[] { System.Reflection.MethodInfo.GetCurrentMethod().Name });
+
+            try
+            {
+#if TEST_LOCK
+                LocalNoSql_CSharp.DB.Database database = new LocalNoSql_CSharp.DB.Database(rootPath, databaseName);
+                IDBCollection collection = database.GetCollection(collectionName);
+
+                bool lockCll = collection.Lock();
+                bool isLocked = collection.IsLocked();
+                bool unlock = collection.Unlock();
+
+                Assert.Pass
+                (
+                    "{0}: Lock: {1}, IsLocked: {2}, Unlock: {3}",
+                    collection.FullCollectionPath,
+                    Convert.ToString(lockCll),
+                    Convert.ToString(lockCll),
+                    Convert.ToString(lockCll)
+                );
+#else
+                throw new FailureException(LocalNoSql_CSharp.Resource.Exceptions.TEST_LOCK_Exception);
+#endif
             }
             catch (NUnit.Framework.SuccessException e)
             {

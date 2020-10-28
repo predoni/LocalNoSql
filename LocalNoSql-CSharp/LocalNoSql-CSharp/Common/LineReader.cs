@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace LocalNoSql_CSharp.Common
 {
+    /// <summary>
+    /// With this class, you can read line by line using FileStream.
+    /// In other words, it makes it easier to read the lines in a file and maintains a secure lock.
+    /// </summary>
     public class LineReader : IEnumerable<string>, IDisposable
     {
         private FileStream _fs;

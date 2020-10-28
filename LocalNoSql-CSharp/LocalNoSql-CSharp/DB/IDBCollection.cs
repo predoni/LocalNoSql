@@ -46,6 +46,7 @@ namespace LocalNoSql_CSharp.DB
         /// <returns>double: the size in bytes of the index</returns>
         double IndexSize();
 
+#if TEST_LOCK
         /// <summary>
         /// Lock a collection and do not allow working on this collection until it releases the lock.
         /// </summary>
@@ -57,6 +58,7 @@ namespace LocalNoSql_CSharp.DB
         /// </summary>
         /// <returns>true on success, false otherwise</returns>
         bool Unlock();
+#endif
 
         /// <summary>
         /// Verifies if the collection is locked.
@@ -118,7 +120,7 @@ namespace LocalNoSql_CSharp.DB
         /// <returns>true on success, otherwise false.</returns>
         bool Validate();
 
-        #region Index
+#region Index
         /// <summary>
         /// Builds an index on a collection.
         /// </summary>
@@ -152,8 +154,8 @@ namespace LocalNoSql_CSharp.DB
         /// <param name="name">Index name</param>
         /// <returns>The index size.</returns>
         double IndexSize(string name);
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }

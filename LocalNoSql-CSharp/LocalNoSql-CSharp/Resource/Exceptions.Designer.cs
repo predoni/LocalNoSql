@@ -22,7 +22,7 @@ namespace LocalNoSql_CSharp.Resource {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Exceptions {
+    public class Exceptions {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace LocalNoSql_CSharp.Resource {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("LocalNoSql_CSharp.Resource.Exceptions", typeof(Exceptions).Assembly);
@@ -51,7 +51,7 @@ namespace LocalNoSql_CSharp.Resource {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace LocalNoSql_CSharp.Resource {
         /// <summary>
         ///   Looks up a localized string similar to Directory not found: .
         /// </summary>
-        internal static string Directory_not_found {
+        public static string Directory_not_found {
             get {
                 return ResourceManager.GetString("Directory_not_found", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace LocalNoSql_CSharp.Resource {
         /// <summary>
         ///   Looks up a localized string similar to Empty array for parameter:.
         /// </summary>
-        internal static string Empty_array_for_parameter {
+        public static string Empty_array_for_parameter {
             get {
                 return ResourceManager.GetString("Empty_array_for_parameter", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace LocalNoSql_CSharp.Resource {
         /// <summary>
         ///   Looks up a localized string similar to Empty string for parameter: .
         /// </summary>
-        internal static string Empty_string_for_parameter {
+        public static string Empty_string_for_parameter {
             get {
                 return ResourceManager.GetString("Empty_string_for_parameter", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace LocalNoSql_CSharp.Resource {
         /// <summary>
         ///   Looks up a localized string similar to Invalid characters for parameter: .
         /// </summary>
-        internal static string Invalid_characters_for_parameter {
+        public static string Invalid_characters_for_parameter {
             get {
                 return ResourceManager.GetString("Invalid_characters_for_parameter", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace LocalNoSql_CSharp.Resource {
         /// <summary>
         ///   Looks up a localized string similar to The &quot;Id&quot; column is mandatory and must be unique..
         /// </summary>
-        internal static string InvalidDocumentId {
+        public static string InvalidDocumentId {
             get {
                 return ResourceManager.GetString("InvalidDocumentId", resourceCulture);
             }
@@ -108,16 +108,25 @@ namespace LocalNoSql_CSharp.Resource {
         /// <summary>
         ///   Looks up a localized string similar to Using root directory to store databases is not allowed. Please create at least one subdirectory in your tree of directories..
         /// </summary>
-        internal static string Root_directory_not_allowed {
+        public static string Root_directory_not_allowed {
             get {
                 return ResourceManager.GetString("Root_directory_not_allowed", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to For testing Lock and Unlock methods you need to set into project properties -&gt; Build -&gt; Conditional compilation symbols: TEST_LOCK.
+        /// </summary>
+        public static string TEST_LOCK_Exception {
+            get {
+                return ResourceManager.GetString("TEST_LOCK_Exception", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This collection already exists..
         /// </summary>
-        internal static string This_collection_already_exists {
+        public static string This_collection_already_exists {
             get {
                 return ResourceManager.GetString("This_collection_already_exists", resourceCulture);
             }
@@ -126,7 +135,7 @@ namespace LocalNoSql_CSharp.Resource {
         /// <summary>
         ///   Looks up a localized string similar to This collection does not exists..
         /// </summary>
-        internal static string This_collection_does_not_exists {
+        public static string This_collection_does_not_exists {
             get {
                 return ResourceManager.GetString("This_collection_does_not_exists", resourceCulture);
             }
@@ -135,7 +144,7 @@ namespace LocalNoSql_CSharp.Resource {
         /// <summary>
         ///   Looks up a localized string similar to Unable to create the collection..
         /// </summary>
-        internal static string Unable_to_create_the_collection {
+        public static string Unable_to_create_the_collection {
             get {
                 return ResourceManager.GetString("Unable_to_create_the_collection", resourceCulture);
             }

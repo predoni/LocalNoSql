@@ -108,7 +108,12 @@ namespace LocalNoSql_CSharp.DB
         /// Lock a collection and do not allow working on this collection until it releases the lock.
         /// </summary>
         /// <returns>true on success, false otherwise</returns>
-        public bool Lock()
+#if TEST_LOCK
+        public
+#else
+        private
+# endif
+        bool Lock()
         {
             DateTime deEnd = DateTime.Now.AddSeconds(DBCollection.LockTimeout);
 
@@ -139,7 +144,12 @@ namespace LocalNoSql_CSharp.DB
         /// Unlocks a collection.
         /// </summary>
         /// <returns>true on success, false otherwise</returns>
-        public bool Unlock()
+#if TEST_LOCK
+        public
+#else
+        private
+#endif
+        bool Unlock()
         {
             this.FSCollection.Close();
             this.FSIndex.Close();
@@ -158,11 +168,11 @@ namespace LocalNoSql_CSharp.DB
                 FileStream fs = System.IO.File.Open(this.FullCollectionPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
                 fs.Close();
 
-                return true;
+                return false;
             }
             catch
             {
-                return false;
+                return true;
             }
         }
 
@@ -288,7 +298,7 @@ namespace LocalNoSql_CSharp.DB
             throw new NotImplementedException();
         }
 
-        #region Index
+#region Index
         /// <summary>
         /// Builds an index on a collection.
         /// </summary>
@@ -337,8 +347,8 @@ namespace LocalNoSql_CSharp.DB
         {
             throw new NotImplementedException();
         }
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }

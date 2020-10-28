@@ -17,7 +17,7 @@ namespace LocalNoSql_CSharp_NUnitTest.Common
             }
 
             [Test, Order(1)] // You can see the order in debug. Is correct!
-            [TestCase(@"C:\testdb\ExistentDB\Collection01 - Copy.cll")]
+            [TestCase(@"C:\testdb\ExistentDB\Collection01.cll")]
             public void Example(string filePath)
             {
                 System.Diagnostics.Debug.WriteLine("Start testing: {0}", new[] { System.Reflection.MethodInfo.GetCurrentMethod().Name });
