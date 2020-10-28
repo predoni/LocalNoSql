@@ -32,15 +32,19 @@ namespace LocalNoSql_CSharp.DB
         public string FullCollectionIndexPath { get => this._FullCollectionIndexPath; }
 
         /// <summary>
-        /// "FullCollectionLockPath" it is the path to the lock file for the current collection.
-        /// </summary>
-        private string _FullCollectionLockPath;
-        public string FullCollectionLockPath { get => this._FullCollectionLockPath; }
-
-        /// <summary>
         /// The period in seconds until the lock action is declared a failure.
         /// </summary>
         const int LockTimeout = 30;
+
+        /// <summary>
+        /// The current collection opened using a file stream.
+        /// </summary>
+        private FileStream FSCollection { get; set; }
+
+        /// <summary>
+        /// The current index opened using a file stream.
+        /// </summary>
+        private FileStream FSIndex { get; set; }
         #endregion
 
         #region Constructors and Destructor
@@ -49,7 +53,7 @@ namespace LocalNoSql_CSharp.DB
         /// </summary>
         /// <param name="name">The collection name where all its documents reside.</param>
         /// <param name="fullCollectionPath">The path of the file for the current collection.</param>
-        public DBCollection(string name, string fullCollectionPath, string fullCollectionIndexPath, string fullCollectionLockPath) : base()
+        public DBCollection(string name, string fullCollectionPath, string fullCollectionIndexPath) : base()
         {
             if (string.IsNullOrEmpty(name))
                 throw new EmptyStringForParameterException(nameof(name));
@@ -60,13 +64,9 @@ namespace LocalNoSql_CSharp.DB
             if (string.IsNullOrEmpty(fullCollectionIndexPath))
                 throw new EmptyStringForParameterException(nameof(fullCollectionIndexPath));
 
-            if (string.IsNullOrEmpty(fullCollectionLockPath))
-                throw new EmptyStringForParameterException(nameof(fullCollectionLockPath));
-
             this._Name = name;
             this._FullCollectionPath = fullCollectionPath;
             this._FullCollectionIndexPath = fullCollectionIndexPath;
-            this._FullCollectionLockPath = fullCollectionLockPath;
         }
         #endregion
 
@@ -120,7 +120,9 @@ namespace LocalNoSql_CSharp.DB
                 {
                     try
                     {
-                        System.IO.File.WriteAllBytes(this.FullCollectionLockPath, new byte[1] { 1 });
+                        this.FSCollection = System.IO.File.Open(this.FullCollectionPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                        this.FSIndex = System.IO.File.Open(this.FullCollectionIndexPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+
                         return true;
                     }
                     catch
@@ -139,15 +141,10 @@ namespace LocalNoSql_CSharp.DB
         /// <returns>true on success, false otherwise</returns>
         public bool Unlock()
         {
-            try
-            {
-                System.IO.File.WriteAllBytes(this.FullCollectionLockPath, new byte[1] { 0 });
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            this.FSCollection.Close();
+            this.FSIndex.Close();
+
+            return true;
         }
 
         /// <summary>
@@ -156,11 +153,17 @@ namespace LocalNoSql_CSharp.DB
         /// <returns>true if is locked, false otherwise</returns>
         public bool IsLocked()
         {
-            var arr = System.IO.File.ReadAllBytes(this.FullCollectionLockPath);
-            if (arr.Length == 0)
-                return false;
+            try
+            {
+                FileStream fs = System.IO.File.Open(this.FullCollectionPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                fs.Close();
 
-            return arr[0] == 1;
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -219,6 +222,7 @@ namespace LocalNoSql_CSharp.DB
 
                 using (System.IO.FileStream fsCll = System.IO.File.Open(this.FullCollectionPath, FileMode.Append, FileAccess.Write, FileShare.Read))
                 {
+                    
                     string statistics;
                     string indexString;
 

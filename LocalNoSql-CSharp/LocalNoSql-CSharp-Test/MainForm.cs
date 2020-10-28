@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using LocalNoSql_CSharp;
+using System.IO;
 
 namespace LocalNoSql_CSharp_Test
 {
@@ -27,6 +29,16 @@ namespace LocalNoSql_CSharp_Test
         }
 
         private void btnTest_Click(object sender, EventArgs e)
+        {
+            TestFileReader();
+        }
+
+        public void TestFileReader()
+        {
+            //LocalNoSql_CSharp.Common.LineReader.Example();
+        }
+
+        public void TestJson()
         {
             //Newtonsoft.Json.
             //Newtonsoft.Json.Bson.BsonDataReader bsonDataReader = new Newtonsoft.Json.Bson.BsonDataReader();

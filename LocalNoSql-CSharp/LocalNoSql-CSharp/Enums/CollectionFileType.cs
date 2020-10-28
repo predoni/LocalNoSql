@@ -9,7 +9,6 @@ namespace LocalNoSql_CSharp.Enums
     public enum CollectionFileType : int
     {
         Collection = 0,
-        Index = 1,
-        Lock = 2
+        Index = 1
     }
 }

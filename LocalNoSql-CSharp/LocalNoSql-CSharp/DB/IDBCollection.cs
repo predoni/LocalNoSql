@@ -25,11 +25,6 @@ namespace LocalNoSql_CSharp.DB
         /// "FullCollectionIndexPath" it is the path to the index file for the current collection.
         /// </summary>
         string FullCollectionIndexPath { get; }
-
-        /// <summary>
-        /// "FullCollectionLockPath" it is the path to the lock file for the current collection.
-        /// </summary>
-        string FullCollectionLockPath { get; }
         #endregion
 
         #region Methods

@@ -8,21 +8,41 @@ using System.Threading.Tasks;
 
 namespace LocalNoSql_CSharp.Common
 {
-    class LineReader : IEnumerable<string>, IDisposable
+    public class LineReader : IEnumerable<string>, IDisposable
     {
-        TextReader _reader;
-        public LineReader(TextReader reader)
+        private FileStream _fs;
+        public LineReader(FileStream fs)
         {
-            _reader = reader;
+            _fs = fs;
         }
 
         public IEnumerator<string> GetEnumerator()
         {
             string line;
-            while ((line = _reader.ReadLine()) != null)
+            while ((line = this.ReadLine()) != null)
             {
                 yield return line;
             }
+        }
+
+        private string ReadLine()
+        {
+            int b;
+            string retStr = string.Empty;
+
+            while(true)
+            {
+                b = this._fs.ReadByte();
+                if (b == -1)
+                    break;
+                
+                retStr += Convert.ToString((char)b);
+                
+                if (retStr.EndsWith(Environment.NewLine))
+                    break;
+            }
+
+            return retStr;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -32,22 +52,7 @@ namespace LocalNoSql_CSharp.Common
 
         public void Dispose()
         {
-            _reader.Dispose();
-        }
-
-        public void Example()
-        {
-            // path is string
-            int skip = 300;
-            StreamReader sr = new StreamReader("Some path");
-            using (var lineReader = new LineReader(sr))
-            {
-                IEnumerable<string> lines = lineReader.Skip(skip);
-                foreach (string line in lines)
-                {
-                    Console.WriteLine(line);
-                }
-            }
+            _fs.Dispose();
         }
     }
 }

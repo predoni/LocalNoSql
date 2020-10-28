@@ -17,7 +17,6 @@ namespace LocalNoSql_CSharp.DB
         #region Properties
         const string CollectionFileExtension = "cll";
         const string CollectionIndexFileExtension = "idx";
-        const string CollectionLockFileExtension = "lock";
         const string IndexStatistics = "Lines:0;";
         const string IndexCollection = "Empty";
 
@@ -201,11 +200,8 @@ namespace LocalNoSql_CSharp.DB
 
             if (fileType == CollectionFileType.Collection)
                 return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionFileExtension);
-
-            if (fileType == CollectionFileType.Index)
-                return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionIndexFileExtension);
             else
-                return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionLockFileExtension);
+                return System.IO.Path.Combine(this.FullDatabasePath, name + "." + Database.CollectionIndexFileExtension);
         }
 
         /// <summary>
@@ -252,11 +248,7 @@ namespace LocalNoSql_CSharp.DB
                 FileStream fs1 = System.IO.File.Open(this.GetCollectionPath(name, CollectionFileType.Index), FileMode.Append, FileAccess.Write);
                 fs1.Close();
             }
-
-            fs = System.IO.File.Create(this.GetCollectionPath(name, CollectionFileType.Lock));
-            fs.Write(new byte[1] { 0 }, 0, 1);
-            fs.Close();
-
+            
             return true;
         }
 
@@ -293,7 +285,6 @@ namespace LocalNoSql_CSharp.DB
             {
                 throw new NotImplementedException("Implementeaza verificarea pe LOCK!");
 
-                System.IO.File.Delete(this.GetCollectionPath(name, CollectionFileType.Lock));
                 System.IO.File.Delete(this.GetCollectionPath(name, CollectionFileType.Collection));
                 System.IO.File.Delete(this.GetCollectionPath(name, CollectionFileType.Index));
 
@@ -332,7 +323,6 @@ namespace LocalNoSql_CSharp.DB
             {
                 throw new NotImplementedException("Implementeaza verificarea pe LOCK!");
 
-                System.IO.File.Move(this.GetCollectionPath(currentName, CollectionFileType.Index), this.GetCollectionPath(newName, CollectionFileType.Lock));
                 System.IO.File.Move(this.GetCollectionPath(currentName, CollectionFileType.Collection), this.GetCollectionPath(newName, CollectionFileType.Collection));
                 System.IO.File.Move(this.GetCollectionPath(currentName, CollectionFileType.Index), this.GetCollectionPath(newName, CollectionFileType.Index));
 
@@ -375,8 +365,7 @@ namespace LocalNoSql_CSharp.DB
                 (
                     name, 
                     this.GetCollectionPath(name, CollectionFileType.Collection),
-                    this.GetCollectionPath(name, CollectionFileType.Index),
-                    this.GetCollectionPath(name, CollectionFileType.Lock)
+                    this.GetCollectionPath(name, CollectionFileType.Index)
                 );
         }
         #endregion
