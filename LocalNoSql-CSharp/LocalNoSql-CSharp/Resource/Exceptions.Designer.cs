@@ -124,6 +124,15 @@ namespace LocalNoSql_CSharp.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The collection is locked..
+        /// </summary>
+        public static string The_collection_is_locked {
+            get {
+                return ResourceManager.GetString("The_collection_is_locked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This collection already exists..
         /// </summary>
         public static string This_collection_already_exists {

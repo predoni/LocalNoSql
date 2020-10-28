@@ -27,16 +27,6 @@ namespace LocalNoSql_CSharp.DB
         /// "FullDatabasePath" is the combination between "RootPath" and "DatabaseName".
         /// </summary>
         string FullDatabasePath { get; }
-
-        /// <summary>
-        /// The last error object
-        /// </summary>
-        IError LastError { get; set; }
-
-        /// <summary>
-        /// The log level that has been set
-        /// </summary>
-        LogLevel LogLevel { get; set; }
         #endregion
 
         #region Methods

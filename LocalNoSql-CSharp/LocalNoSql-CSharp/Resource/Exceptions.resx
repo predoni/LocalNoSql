@@ -138,6 +138,9 @@
   <data name="TEST_LOCK_Exception" xml:space="preserve">
     <value>For testing Lock and Unlock methods you need to set into project properties -&gt; Build -&gt; Conditional compilation symbols: TEST_LOCK</value>
   </data>
+  <data name="The_collection_is_locked" xml:space="preserve">
+    <value>The collection is locked.</value>
+  </data>
   <data name="This_collection_already_exists" xml:space="preserve">
     <value>This collection already exists.</value>
   </data>

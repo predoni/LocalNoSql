@@ -39,16 +39,6 @@ namespace LocalNoSql_CSharp.DB
         /// </summary>
         private string _FullDatabasePath;
         public string FullDatabasePath { get => this._FullDatabasePath; }
-
-        /// <summary>
-        /// The last error object
-        /// </summary>
-        public IError LastError { get; set; }
-
-        /// <summary>
-        /// The log level that has been set
-        /// </summary>
-        public LogLevel LogLevel { get; set; }
         #endregion
 
         #region Constructors and Destructor
@@ -283,7 +273,9 @@ namespace LocalNoSql_CSharp.DB
 
             try
             {
-                throw new NotImplementedException("Implementeaza verificarea pe LOCK!");
+                IDBCollection collection = this.GetCollection(name);
+                if (collection.IsLocked())
+                    throw new FailureException(Resource.Exceptions.The_collection_is_locked);
 
                 System.IO.File.Delete(this.GetCollectionPath(name, CollectionFileType.Collection));
                 System.IO.File.Delete(this.GetCollectionPath(name, CollectionFileType.Index));
@@ -318,10 +310,11 @@ namespace LocalNoSql_CSharp.DB
             if (!this.CollectionExists(currentName))
                 throw new FailureException(Resource.Exceptions.This_collection_does_not_exists + Environment.NewLine + currentName);
 
-
             try
             {
-                throw new NotImplementedException("Implementeaza verificarea pe LOCK!");
+                IDBCollection collection = this.GetCollection(currentName);
+                if (collection.IsLocked())
+                    throw new FailureException(Resource.Exceptions.The_collection_is_locked);
 
                 System.IO.File.Move(this.GetCollectionPath(currentName, CollectionFileType.Collection), this.GetCollectionPath(newName, CollectionFileType.Collection));
                 System.IO.File.Move(this.GetCollectionPath(currentName, CollectionFileType.Index), this.GetCollectionPath(newName, CollectionFileType.Index));
