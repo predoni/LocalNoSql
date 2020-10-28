@@ -66,8 +66,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\Error.cs" />
-    <Compile Include="Common\IError.cs" />
     <Compile Include="Common\JsonUtil.cs" />
     <Compile Include="Common\LineReader.cs" />
     <Compile Include="DB\Database.cs" />
