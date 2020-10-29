@@ -13,7 +13,7 @@ namespace LocalNoSql_CSharp_NUnitTest.DB
         private const string JSON_EmptyString = "";
         private const string JSON_EmptyArray = "[]";
         private const string JSON_OneDocumentArray = "[{Id: 1, col1: \"Value 1\"}]";
-        private const string JSON_ManyDocumentsArray = "[{Id: \"1000.50\", col1: \"Value 1\"}, {Id: 2, col1: \"Value 2\"}, {Id: 3, col1: \"Value 3\"}]";
+        private const string JSON_ManyDocumentsArray = "[{Id: 1, col1: \"Value 1\"}, {Id: 2, col1: \"Value 2\"}, {Id: 3, col1: \"Value 3\"}, {Id: 4, col1: \"Value 4\"}, {Id: 5, col1: \"Value 5\"}]";
         private const string JSON_DuplicatedIds = "[{Id: 1, col1: \"Value 1\"}, {Id: 2, col1: \"Value 2\"}, {Id: 2, col1: \"Value 3\"}]";
 
         [SetUp]

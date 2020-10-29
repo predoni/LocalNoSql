@@ -32,10 +32,9 @@ namespace LocalNoSql_CSharp.Model
         /// Copy constructor.
         /// </summary>
         /// <param name="documentObject">The object to copy.</param>
-        public DocumentObject(DocumentObject<T> documentObject) : base()
-        {
-            this.Id = documentObject.Id;
-        }
+        public DocumentObject(DocumentObject<T> documentObject) : 
+            base() => 
+                this.Id = documentObject.Id;
         #endregion
 
         #region Methods
@@ -325,10 +324,7 @@ namespace LocalNoSql_CSharp.Model
         /// It is an "override" and return the string value of "Id" parameter.
         /// </summary>
         /// <returns>true is the correct type, false otherwise.</returns>
-        public override string ToString()
-        {
-            return this.Id.ToString();
-        }
+        public override string ToString() => this.Id.ToString();
         #endregion
     }
 }

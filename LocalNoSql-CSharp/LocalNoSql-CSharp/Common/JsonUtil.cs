@@ -8,7 +8,7 @@ namespace LocalNoSql_CSharp.Common
 {
     public static class JsonUtil
     {
-        public static string GetFormattedJsonLine(string jsonString)
+        public static string GetJsonLine(string jsonString)
         {
             return Newtonsoft.Json.Linq.JObject.Parse(jsonString).ToString(Newtonsoft.Json.Formatting.None, null);
         }

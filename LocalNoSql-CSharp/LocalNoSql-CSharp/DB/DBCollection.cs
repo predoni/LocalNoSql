@@ -209,7 +209,7 @@ namespace LocalNoSql_CSharp.DB
         /// <param name="jsonDocumentString">The json string that represents an array of documents.</param>
         /// <exception cref="Exceptions.EmptyStringForParameterException">Empty json string.</exception>
         /// <exception cref="Exceptions.EmptyArrayException">Empty json array."</exception>
-        /// <exception cref="Exceptions.FailureException">Empty json array."</exception>
+        /// <exception cref="Exceptions.DuplicatedIdException">This "Id" already exists.</exception>
         /// <returns>total number of inserted documents</returns>
         public int Insert(string jsonDocumentString)
         {
@@ -221,31 +221,80 @@ namespace LocalNoSql_CSharp.DB
                 throw new EmptyArrayException(nameof(jsonDocumentString));
 
             int docsNum = 0;
-            for (int i = 0; i < jarr.Count; i++)
+            string jsonLine;
+            
+            if (this.Lock())
             {
-                System.Diagnostics.Debug.WriteLine(jarr[i].ToString());
-
-                Model.DocumentObject<string> documentObject =
-                    Newtonsoft.Json.JsonConvert.DeserializeObject<Model.DocumentObject<string>>(jarr[i].ToString());
-
-                byte[] document = Encoding.ASCII.GetBytes(Common.JsonUtil.GetFormattedJsonLine(jarr[i].ToString()) + Environment.NewLine);
-
-                if (this.Lock())
+                using (StreamWriter swCollection = new StreamWriter(this.FSCollection))
                 {
-                    // if(Id-ul exista in baza de date)
-                    //     throw exception
-                    // else
-                    // {
-                    //     insert into collection
-                    //     insert into index
-                    //     unlock
-                    // }
-                }
-                else
-                    throw new TimeoutException(Resource.Exceptions.TimeoutExpired);
-            }
+                    using (StreamWriter swIndex = new StreamWriter(this.FSIndex))
+                    {
+                        long startPosition;
+                        long endPosition;
+                        long lengthTotal;
 
-            return docsNum;
+                        for (int i = 0; i < jarr.Count; i++)
+                        {
+                            jsonLine = Common.JsonUtil.GetJsonLine(jarr[i].ToString());
+                            System.Diagnostics.Debug.WriteLine(jsonLine);
+
+                            Model.DocumentObject<string> documentObject =
+                                Newtonsoft.Json.JsonConvert.DeserializeObject<Model.DocumentObject<string>>(jsonLine);
+
+                            if (this.IdExists(documentObject.Id))
+                                throw new Exceptions.DuplicatedIdException();
+                            else
+                            {
+                                // The position from where to start insert the document.
+                                startPosition = this.GetPositionToInsertIntoCollection();
+                                this.FSCollection.Seek(startPosition, SeekOrigin.Begin);
+                                swCollection.WriteLine(jsonLine);
+                                swCollection.Flush();
+                                endPosition = this.FSCollection.Position;
+
+                                // This value contains the NewLine and CarriageReturn character
+                                lengthTotal = endPosition - startPosition;
+
+                                // insert into index
+                                string indexLine = documentObject.Id + "," + startPosition.ToString() + "," + lengthTotal.ToString();
+                                startPosition = this.GetPositionToInsertIntoIndex();
+                                this.FSIndex.Seek(startPosition, SeekOrigin.Begin);
+                                swIndex.WriteLine(indexLine);
+                                swIndex.Flush();
+
+                                docsNum++;
+                            }
+                        }
+                    }
+                }
+
+                return docsNum;
+            }
+            else
+                throw new TimeoutException(Resource.Exceptions.TimeoutExpired);
+        }
+
+        public Guid Int2Guid(int value)
+        {
+            byte[] bytes = new byte[16];
+            BitConverter.GetBytes(value).CopyTo(bytes, 12);
+            return new Guid(bytes);
+        }
+
+        public bool IdExists(string id)
+        {
+            
+            return false;
+        }
+
+        public long GetPositionToInsertIntoCollection()
+        {
+            return this.FSCollection.Length;
+        }
+
+        public long GetPositionToInsertIntoIndex()
+        {
+            return this.FSIndex.Length;
         }
 
         /// <summary>

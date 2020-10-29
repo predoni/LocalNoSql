@@ -70,6 +70,15 @@ namespace LocalNoSql_CSharp.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This &quot;Id&quot; already exists..
+        /// </summary>
+        public static string DuplicatedId {
+            get {
+                return ResourceManager.GetString("DuplicatedId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty array for parameter:.
         /// </summary>
         public static string Empty_array_for_parameter {
@@ -88,20 +97,20 @@ namespace LocalNoSql_CSharp.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The &quot;Id&quot; column is mandatory..
+        /// </summary>
+        public static string IdColumnMissing {
+            get {
+                return ResourceManager.GetString("IdColumnMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid characters for parameter: .
         /// </summary>
         public static string Invalid_characters_for_parameter {
             get {
                 return ResourceManager.GetString("Invalid_characters_for_parameter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The &quot;Id&quot; column is mandatory and must be unique..
-        /// </summary>
-        public static string InvalidDocumentId {
-            get {
-                return ResourceManager.GetString("InvalidDocumentId", resourceCulture);
             }
         }
         

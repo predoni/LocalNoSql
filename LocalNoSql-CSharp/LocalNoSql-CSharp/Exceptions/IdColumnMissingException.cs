@@ -10,13 +10,13 @@ namespace LocalNoSql_CSharp.Exceptions
     public class IdColumnMissingException : Exception
     {
         public IdColumnMissingException() : 
-            base(Resource.Exceptions.Empty_array_for_parameter)
+            base(Resource.Exceptions.IdColumnMissing)
         {
             
         }
 
         public IdColumnMissingException(Exception innerException) :
-            base(Resource.Exceptions.InvalidDocumentId, innerException)
+            base(Resource.Exceptions.IdColumnMissing, innerException)
         {
         }
     }

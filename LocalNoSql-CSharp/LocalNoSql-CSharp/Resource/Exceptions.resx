@@ -120,14 +120,17 @@
   <data name="Directory_not_found" xml:space="preserve">
     <value>Directory not found: </value>
   </data>
+  <data name="DuplicatedId" xml:space="preserve">
+    <value>This "Id" already exists.</value>
+  </data>
   <data name="Empty_array_for_parameter" xml:space="preserve">
     <value>Empty array for parameter:</value>
   </data>
   <data name="Empty_string_for_parameter" xml:space="preserve">
     <value>Empty string for parameter: </value>
   </data>
-  <data name="InvalidDocumentId" xml:space="preserve">
-    <value>The "Id" column is mandatory and must be unique.</value>
+  <data name="IdColumnMissing" xml:space="preserve">
+    <value>The "Id" column is mandatory.</value>
   </data>
   <data name="Invalid_characters_for_parameter" xml:space="preserve">
     <value>Invalid characters for parameter: </value>

@@ -76,6 +76,7 @@
     <Compile Include="DB\IView.cs" />
     <Compile Include="DB\IViewInfo.cs" />
     <Compile Include="Enums\CollectionFileType.cs" />
+    <Compile Include="Exceptions\DuplicatedIdException.cs" />
     <Compile Include="Exceptions\IdColumnMissingException.cs" />
     <Compile Include="Exceptions\EmptyStringForParameterException.cs" />
     <Compile Include="Exceptions\EmptyArrayException.cs" />
