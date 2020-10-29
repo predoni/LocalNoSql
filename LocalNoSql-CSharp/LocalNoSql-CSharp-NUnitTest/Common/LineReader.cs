@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using LocalNoSql_CSharp.Exceptions;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,39 +28,38 @@ namespace LocalNoSql_CSharp_NUnitTest.Common
                     // path is string
                     int skip = 2;
                     FileStream fs = System.IO.File.Open(filePath, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                    
                     using (var lineReader = new LocalNoSql_CSharp.Common.LineReader(fs))
                     {
                         System.Diagnostics.Debug.WriteLine("Test 1 ============================================");
-                        IEnumerable<string> lines = lineReader.Skip(skip);//.Take(2);//.ToList();
+                        IEnumerable<string> lines = lineReader.Skip(skip);
                         foreach (string line in lines)
                         {
-                            System.Diagnostics.Debug.Write(line);
-
-                            if (fs.Length == fs.Position)
-                                break; // EOF: end of file
+                            System.Diagnostics.Debug.WriteLine(line);
                         }
 
                         System.Diagnostics.Debug.WriteLine("Test 2 ============================================");
 
-                        fs.Position = 0;
-                        lines = lineReader.Skip(1).Take(2);//.ToList();
+                        lineReader.DiscardBufferedData();
+                        if (fs.Seek(0, SeekOrigin.Begin) != 0)
+                            throw new FailureException("Cursor position has not been set to the beginning or the file.");
+
+                        lines = lineReader.Skip(1).Take(2);
                         foreach (string line in lines)
                         {
-                            System.Diagnostics.Debug.Write(line);
-
-                            if (fs.Length == fs.Position)
-                                break; // EOF: end of file
+                            System.Diagnostics.Debug.WriteLine(line);
                         }
 
                         System.Diagnostics.Debug.WriteLine("Test 3 ============================================");
 
-                        fs.Position = 0;
+                        lineReader.DiscardBufferedData();
+                        if (fs.Seek(0, SeekOrigin.Begin) != 0)
+                            throw new FailureException("Cursor position has not been set to the beginning or the file.");
+                        
+                        lines = lineReader.AsEnumerable();
                         foreach (string line in lineReader)
                         {
-                            System.Diagnostics.Debug.Write(line);
-
-                            if (fs.Length == fs.Position)
-                                break; // EOF: end of file
+                            System.Diagnostics.Debug.WriteLine(line);
                         }
 
                         System.Diagnostics.Debug.WriteLine("END ============================================");

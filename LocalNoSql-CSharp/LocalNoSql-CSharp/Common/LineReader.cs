@@ -14,49 +14,24 @@ namespace LocalNoSql_CSharp.Common
     /// </summary>
     public class LineReader : IEnumerable<string>, IDisposable
     {
-        private FileStream _fs;
-        public LineReader(FileStream fs)
-        {
-            _fs = fs;
-        }
+        private readonly StreamReader _sr;
+        public bool EndOfStream { get => this._sr.EndOfStream; }
+        
+        public LineReader(FileStream fs) =>  this._sr = new StreamReader(fs);
 
         public IEnumerator<string> GetEnumerator()
         {
             string line;
-            while ((line = this.ReadLine()) != null)
+            while ((line = this._sr.ReadLine()) != null)
             {
                 yield return line;
             }
         }
 
-        private string ReadLine()
-        {
-            int b;
-            string retStr = string.Empty;
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            while(true)
-            {
-                b = this._fs.ReadByte();
-                if (b == -1)
-                    break;
-                
-                retStr += Convert.ToString((char)b);
-                
-                if (retStr.EndsWith(Environment.NewLine))
-                    break;
-            }
+        public void DiscardBufferedData() => this._sr.DiscardBufferedData();
 
-            return retStr;
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public void Dispose()
-        {
-            _fs.Dispose();
-        }
+        public void Dispose() => this._sr.Dispose();
     }
 }
