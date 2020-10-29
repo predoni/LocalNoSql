@@ -151,6 +151,15 @@ namespace LocalNoSql_CSharp.Resource {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Timeout expired. The timeout period elapsed prior to completion of the operation..
+        /// </summary>
+        public static string TimeoutExpired {
+            get {
+                return ResourceManager.GetString("TimeoutExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to create the collection..
         /// </summary>
         public static string Unable_to_create_the_collection {

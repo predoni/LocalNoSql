@@ -147,6 +147,9 @@
   <data name="This_collection_does_not_exists" xml:space="preserve">
     <value>This collection does not exists.</value>
   </data>
+  <data name="TimeoutExpired" xml:space="preserve">
+    <value>Timeout expired. The timeout period elapsed prior to completion of the operation.</value>
+  </data>
   <data name="Unable_to_create_the_collection" xml:space="preserve">
     <value>Unable to create the collection.</value>
   </data>

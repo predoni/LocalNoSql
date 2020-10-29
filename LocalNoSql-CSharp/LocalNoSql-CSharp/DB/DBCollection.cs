@@ -230,25 +230,19 @@ namespace LocalNoSql_CSharp.DB
 
                 byte[] document = Encoding.ASCII.GetBytes(Common.JsonUtil.GetFormattedJsonLine(jarr[i].ToString()) + Environment.NewLine);
 
-                using (System.IO.FileStream fsCll = System.IO.File.Open(this.FullCollectionPath, FileMode.Append, FileAccess.Write, FileShare.Read))
+                if (this.Lock())
                 {
-                    
-                    string statistics;
-                    string indexString;
-
-                    using (System.IO.StreamReader sr = new StreamReader(this.FullCollectionIndexPath))
-                    {
-                        statistics = sr.ReadLine();
-                        indexString = sr.ReadLine();
-                    }
-
-                    using (System.IO.FileStream fsIdx = System.IO.File.Open(this.FullCollectionPath.Replace(".cll", ".idx"), FileMode.Append, FileAccess.Write, FileShare.Read))
-                    {
-                        //fsCll.Write(document, 0, document.Length);
-                        //fsCll.Flush();
-                        docsNum++;
-                    }
+                    // if(Id-ul exista in baza de date)
+                    //     throw exception
+                    // else
+                    // {
+                    //     insert into collection
+                    //     insert into index
+                    //     unlock
+                    // }
                 }
+                else
+                    throw new TimeoutException(Resource.Exceptions.TimeoutExpired);
             }
 
             return docsNum;
