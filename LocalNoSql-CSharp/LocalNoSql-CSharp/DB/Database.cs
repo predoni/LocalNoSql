@@ -17,8 +17,34 @@ namespace LocalNoSql_CSharp.DB
         #region Properties
         const string CollectionFileExtension = "cll";
         const string CollectionIndexFileExtension = "idx";
-        const string IndexStatistics = "Lines:0;";
-        const string IndexCollection = "Empty";
+
+        /// <summary>
+        /// The total number of lines in collection, and is the first line in the statistics file.
+        /// The structure is: number of lines for collection file, number of lines for the index file
+        /// </summary>
+        const string IndexStatistics = "CollectionLines:0,IndexLines:3,EmptyLinePos:30";
+
+        /// <summary>
+        /// A page contains 1000 ids ordered ascending and positions.
+        /// If an id has been deleted then position value is -1, but in maintained into the page,
+        /// just in case it will be reintroduced into the collection.
+        /// The stucture is: Page_<start_id>:<id>,<start_position>;<id>,<start_position>;...
+        /// </summary>
+        const string IndexCollection = "Page_0:";
+
+        /// <summary>
+        /// The empty lines row is always at the end of the index.
+        /// It contains the start position and length.
+        /// The structure is: "Empty:<start_position>,<line_length>;<start_position>,<line_length>;..."
+        /// </summary>
+        const string IndexEmptyLines = "Empty:";
+
+        /// <summary>
+        /// Store the information about the pages, its posions and length.
+        /// The pages are in assending order.
+        /// The structure is: Pages:<number>,<start_position>,<legth>;<number>,<start_position>,<legth>;
+        /// </summary>
+        const string IndexPages = "CollectionLines:0,IndexLines:3";
 
         /// <summary>
         /// The database is a directory!

@@ -298,15 +298,6 @@ namespace LocalNoSql_CSharp.DB
         }
 
         /// <summary>
-        /// Performs map-reduce style data aggregation.
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerator MapReduce()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
         /// Replaces a single document in a collection.
         /// </summary>
         /// <returns>true on success, otherwise false.</returns>
